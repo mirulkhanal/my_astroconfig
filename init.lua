@@ -1,3 +1,5 @@
+-- init.lua
+
 return {
   -- Configure AstroNvim updates
   updater = {
@@ -18,7 +20,7 @@ return {
   },
 
   -- Set colorscheme to use
-  colorscheme = "sonokai",
+  colorscheme = "gruvbox",
 
   -- Diagnostics configuration (for vim.diagnostics.config({...})) when diagnostics are on
   diagnostics = {
@@ -65,21 +67,28 @@ return {
     },
   },
 
+    polish = function()
+    -- Set up custom filetypes
+    local neorgw_sync = require("user.norgw-sync")
+
+    -- Auto-Command for Neorg Workspace Open
+    vim.api.nvim_exec([[
+      augroup NeorgWorkspaceSync
+        autocmd!
+        autocmd User Neorg workspace lua require('user.norgw-sync').sync_workspace()
+      augroup END
+    ]], false)
+
+    -- Auto-Command for .norg file save and close
+    vim.api.nvim_exec([[
+      augroup NorgFileSaveSync
+        autocmd!
+        autocmd BufWritePost *.norg lua require('user.norgw-sync').sync_workspace()
+      augroup END
+    ]], false)
+  end,
+
   -- This function is run last and is a good place to configuring
   -- augroups/autocommands and custom filetypes also this just pure lua so
   -- anything that doesn't fit in the normal config locations above can go here
-  polish = function()
-    -- Set up custom filetypes
-    -- vim.filetype.add {
-    --   extension = {
-    --     foo = "fooscript",
-    --   },
-    --   filename = {
-    --     ["Foofile"] = "fooscript",
-    --   },
-    --   pattern = {
-    --     ["~/%.config/foo/.*"] = "fooscript",
-    --   },
-    -- }
-  end,
 }

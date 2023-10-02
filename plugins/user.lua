@@ -27,9 +27,19 @@ return {
     ft = "norg", -- lazy load on filetype
     cmd = "Neorg", -- lazy load on command, allows you to autocomplete :Neorg regardless of whether it's loaded yet
     --  (you could also just remove both lazy loading things)
+    run = function() vim.fn['neorg_workspace_sync']() end,
     priority = 30, -- treesitter is on default priority of 50, neorg should load after it.
     config = function()
       require("neorg").setup {
+        build = ":Neorg sync-parsers",
+
+        dependencies = {
+          "nvim-treesitter/nvim-treesitter",
+          "nvim-treesitter/nvim-treesitter-textobjects",
+          "nvim-cmp",
+          "nvim-lua/plenary.nvim",
+        },
+
         load = {
           ["core.defaults"] = {},
           ["core.concealer"] = {},
@@ -39,6 +49,7 @@ return {
               workspaces = {
                 life = "~/Desktop/ORG/life/",
                 journal = "~/Desktop/ORG/worg/",
+                courses = "~/Desktop/ORG/life/courses/",
               },
             },
           },
@@ -57,4 +68,10 @@ return {
   },
   { "ziontee113/color-picker.nvim" },
   { "sainnhe/sonokai" },
+  {
+    "kylechui/nvim-surround",
+    version = "*", -- Use for stability; omit to use `main` branch for the latest features
+    event = "VeryLazy",
+    config = function() require("nvim-surround").setup {} end,
+  },
 }
