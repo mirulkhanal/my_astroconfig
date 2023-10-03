@@ -23,10 +23,29 @@ function M.sync_workspace()
     local is_behind = vim.fn.system("git status -uno | grep 'Your branch is behind'") ~= ""
 
     if is_behind then
-        -- Local is behind, pull changes
-        print("Local branch is behind. Pulling changes...")
-        vim.fn.system("git pull")
-        print('Pull Success. 😀')
+        -- Local is behind, try pulling changes
+        print("Local branch is behind. Attempting to pull changes...")
+
+        local pull_status = vim.fn.system("git pull")
+
+        if pull_status == 0 then
+            print('Pull Success. 😀')
+        else
+            -- Pull was not successful (probably due to local changes). Add, commit, and pull again
+            print("Pull failed. Adding and committing local changes...")
+
+            vim.fn.system({'git', 'add', '.'})
+            local commit_message = get_commit_message()
+            vim.fn.system({'git', 'commit', '-m', commit_message})
+
+            local second_pull_status = vim.fn.system("git pull")
+
+            if second_pull_status == 0 then
+                print('Second Pull Success. 😀')
+            else
+                print('Second Pull failed. Please resolve conflicts manually.')
+            end
+        end
     else
         -- Nothing to pull, add, commit, and push changes
         print("Local repository is up to date. Adding, committing, and pushing changes...")
