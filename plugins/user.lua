@@ -22,41 +22,45 @@ return {
     },
     priority = 900,
   },
-  {
-    "nvim-neorg/neorg",
-    ft = "norg", -- lazy load on filetype
-    cmd = "Neorg", -- lazy load on command, allows you to autocomplete :Neorg regardless of whether it's loaded yet
-    --  (you could also just remove both lazy loading things)
-    run = function() vim.fn['neorg_workspace_sync']() end,
-    priority = 30, -- treesitter is on default priority of 50, neorg should load after it.
+{
+     "nvim-neorg/neorg",
+     ft = "norg",
+     dependencies = {
+       "nvim-treesitter/nvim-treesitter",
+       "nvim-treesitter/nvim-treesitter-textobjects",
+       "nvim-cmp",
+       "nvim-lua/plenary.nvim",
+     },
+     build = ":Neorg sync-parsers",
+     cmd = "Neorg",
     config = function()
       require("neorg").setup {
-        build = ":Neorg sync-parsers",
-
-        dependencies = {
-          "nvim-treesitter/nvim-treesitter",
-          "nvim-treesitter/nvim-treesitter-textobjects",
-          "nvim-cmp",
-          "nvim-lua/plenary.nvim",
-        },
-
-        load = {
-          ["core.defaults"] = {},
-          ["core.concealer"] = {},
-          ["core.completion"] = { config = { engine = "nvim-cmp", name = "[Norg]" } },
-          ["core.dirman"] = {
+      load = {
+       ["core.defaults"] = {},
+       ["core.completion"] = { config = { engine = "nvim-cmp", name = "[Norg]" } },
+       ["core.integrations.nvim-cmp"] = {},
+       ["core.concealer"] = { config = { icon_preset = "diamond" } },
+       ["core.export"] = {},
+       ["core.dirman"] = {
             config = {
               workspaces = {
                 life = "~/Desktop/ORG/life/",
-                journal = "~/Desktop/ORG/worg/",
-                courses = "~/Desktop/ORG/life/courses/",
+                courses = "~/Desktop/ORG/life/courses"
               },
             },
-          },
         },
-      }
+        -- Keybinds
+       ["core.keybinds"] = {
+         -- https://github.com/nvim-neorg/neorg/blob/main/lua/neorg/modules/core/keybinds/keybinds.lua
+         config = {
+           default_keybinds = true,
+           neorg_leader = "<Leader><Leader>",
+         },
+       },
+     }
+    }
     end,
-  },
+   },
   { "ellisonleao/gruvbox.nvim", priority = 1000 },
   {
     "folke/twilight.nvim",
